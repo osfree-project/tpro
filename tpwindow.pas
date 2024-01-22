@@ -179,7 +179,7 @@ function MakeWindow
     ) : Boolean;             {Returns True if successful}
   {-Allocate and initialize, but do not display, a new window}
 begin
-  Result:=false;
+  MakeWindow:=false;
 
   // @Todo add check of free memory
   GetMem(W, SizeOf(WindowRec));
@@ -221,7 +221,7 @@ begin
     end;
 
   end;
-  Result:=True;
+  MakeWindow:=True;
 end;
 
 procedure DisposeWindow(W : WindowPtr);
@@ -234,7 +234,7 @@ end;
 function DisplayWindow(W : WindowPtr) : Boolean;
   {-Display the specified window, returning true if successful}
 begin
-  Result:=False;
+  DisplayWindow:=False;
   With WindowP(W)^, Draw do
   begin
     SaveState(Previous);
@@ -249,7 +249,7 @@ begin
     TextAttr:=WAttr;
     if Clear then ClrScr;
   end;
-  Result:=True;
+  DisplayWindow:=True;
 end;
 
 function EraseTopWindow : WindowPtr;

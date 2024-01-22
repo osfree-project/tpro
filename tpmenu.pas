@@ -31,6 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 {$H-}
 
+{$I tpdefine.inc}
+
 unit tpmenu;
 
 interface
@@ -42,6 +44,28 @@ uses
 const
   LotusFrame = #255#255#255#255#255#255; {Tag denotes unframed submenus}
   NoFrame = LotusFrame;      {Synonym for LotusFrame}
+  HideCursor : Boolean = True; {False to leave hardware cursor on while menus displayed}
+
+  {Raw commands for menu activity}
+  MKSNone = 0;               {Not a command}
+  MKSAlpha = 1;              {An alphanumeric character}
+  MKSUp = 2;                 {Cursor up}
+  MKSDown = 3;               {Cursor down}
+  MKSLeft = 6;               {Cursor left}
+  MKSRight = 7;              {Cursor right}
+  MKSExit = 8;               {Exit the menu}
+  MKSSelect = 9;             {Select the current item}
+  MKSHelp = 10;              {Provide help about current item}
+  MKSHome = 11;              {Cursor to first menu item}
+  MKSEnd = 12;               {Cursor to last menu item}
+  MKSProbe = 13;             {Attempt to select item with mouse}
+  MKSUser0 = 14;             {User-defined exit commands}
+  MKSUser1 = 15;
+  MKSUser2 = 16;
+  MKSUser3 = 17;
+
+type
+  MKType = MKSNone..MKSUser3;
 
 type
   Orientation =              {Which direction scrolling proceeds}
@@ -151,6 +175,17 @@ function MenuChoice(Mnu : Menu; var SelectKey : Char) : MenuKey;
   {-Display menu system, let user browse it, return menukey of selected item,
     return keystroke used to select item, leave menu on screen}
 
+  {$IFDEF Tpro5Menu}
+procedure EnableMenuItem(Mnu : Menu; MKey : MenuKey);
+  {-Allow the user to select the specified menu item in the specified menu}
+
+procedure DisableMenuItem(Mnu : Menu; MKey : MenuKey);
+  {-Prevent the user from selecting the specified item in the specified menu}
+  {$ENDIF}
+
+function AddMenuCommand(Cmd : MKType; NumKeys : Byte; Key1, Key2 : Word) : Boolean;
+  {-Add a new command key assignment or change an existing one}
+
 implementation
 
 var
@@ -163,7 +198,7 @@ begin
   FillChar(CurrentMenu^, SizeOf(MenuRec), 0);
   CurrentMenu^.SelectKeys:=SelectKeys;
   CurrentMenu^.UserFunc:=UserFunc;
-  Result:=CurrentMenu;
+  NewMenu:=CurrentMenu;
 end;
 
 procedure SubMenu(XLP, YLP, YhelpP : Byte;
@@ -377,7 +412,7 @@ begin
     case k of
     #13: // enter
     begin
-      Result:=Mnu^.Active^.Items.Current^.Key;
+      MenuChoice:=Mnu^.Active^.Items.Current^.Key;
     end;
     #0:
     begin
@@ -408,6 +443,23 @@ begin
     end;
     DrawSubMenu(Mnu^.Active, nil);
   until K in [#13];
+end;
+
+{$IFDEF Tpro5Menu}
+procedure EnableMenuItem(Mnu : Menu; MKey : MenuKey);
+  {-Allow the user to select the specified menu item in the specified menu}
+begin
+end;
+
+procedure DisableMenuItem(Mnu : Menu; MKey : MenuKey);
+  {-Prevent the user from selecting the specified item in the specified menu}
+begin
+end;
+{$ENDIF}
+
+function AddMenuCommand(Cmd : MKType; NumKeys : Byte; Key1, Key2 : Word) : Boolean;
+  {-Add a new command key assignment or change an existing one}
+begin
 end;
 
 end.
